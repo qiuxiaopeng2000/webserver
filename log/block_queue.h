@@ -1,5 +1,5 @@
-#ifndef LOG_H
-#define LOG_H
+#ifndef BLOCK_QUEUE_H
+#define BLOCK_QUEUE_H
 
 #include <pthread.h>
 #include <sys/time.h>
