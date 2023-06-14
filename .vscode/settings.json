@@ -49,7 +49,9 @@
         "streambuf": "c",
         "cinttypes": "c",
         "typeinfo": "c",
-        "log.h": "c"
+        "log.h": "c",
+        "mutex": "cpp",
+        "condition_variable": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }
