@@ -13,20 +13,20 @@
 
 using namespace std;
 
-class connction_pool {
+class connection_pool {
 private:
-    static connction_pool* get_instance();      // single model
+    static connection_pool* get_instance();      // single model
 
-    MYSQL* GetConnection();     // create connection
+    MYSQL* GetConnection();     // get one connection from pool
     bool ReleaseConnection(MYSQL* conn);       // release connection
-    int GetFreeConnection();        // get free connection
+    int CountFreeConnection();        // get free connection
     void DestroyPool();         // destory connection pool
 
-    void init(string url, string User, string PassWord, string DataBaseName, int Port, int MaxConn, int close_log);
+    void init(string url, string User, string PassWord, string DatabaseName, int Port, int MaxConn, int close_log);
 
 public:
-    connction_pool();
-    ~connction_pool();
+    connection_pool();
+    ~connection_pool();
 
     int m_MaxConn;
     int m_CurrConn;
@@ -34,16 +34,21 @@ public:
     lock m_lock;
     list<MYSQL*> connList;      // connection pool
     signal m_connection;
-    int m_close_log;        // 日志开关
+    string m_url;			 //主机地址
+	string m_Port;		 //数据库端口号
+	string m_User;		 //登陆数据库用户名
+	string m_PassWord;	 //登陆数据库密码
+	string m_DatabaseName; //使用数据库名
+	int m_close_log;	//日志开关
 
 };
 
 class ConnectionRAII{
 private:
     MYSQL* conRALL;
-    connction_pool* pollRALL;
+    connection_pool* poolRALL;
 public:
-    ConnectionRAII(MYSQL** conn, connction_pool* connPool);
+    ConnectionRAII(MYSQL** conn, connection_pool* connPool);
     ~ConnectionRAII();
 
 };
