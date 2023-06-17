@@ -44,7 +44,7 @@ public:
 
 public:
     util_timer(): prev(NULL), next(NULL) {}     // 只在初始化函数中使用，用于初始化成员变量的值
-    void (* cb_func)(client_data*);         // 函数指针
+    void (* cb_func)(client_data*);         // 函数指针, 定时器回调函数, 从内核事件表删除事件，关闭文件描述符，释放连接资源。
 
 }
 
