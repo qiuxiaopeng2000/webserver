@@ -6,6 +6,7 @@
 #include <mysql/mysql.h>
 #include <error.h>
 #include <string.h>
+#include <cstring>
 #include <iostream>
 #include "../synchronize/lock.h"
 #include "../synchronize/signal.h"
@@ -43,6 +44,8 @@ public:
 
 };
 
+// 将数据库连接的获取与释放通过RAII机制封装，避免手动释放。
+// RAII机制：自动进行资源的获取和释放
 class ConnectionRAII{
 private:
     MYSQL* conRALL;

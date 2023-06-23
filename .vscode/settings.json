@@ -51,7 +51,9 @@
         "typeinfo": "c",
         "log.h": "c",
         "mutex": "cpp",
-        "condition_variable": "cpp"
+        "condition_variable": "cpp",
+        "map": "cpp",
+        "ratio": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

@@ -73,7 +73,7 @@ public:
     static int* u_pipefd;
     sort_timer_lst m_timer_lst;
     static int u_epollfd;
-    int m_TIMESLOT;
+    int m_TIMESLOT;     // 固定时间，超过该时间视为连接超时
 
 public:
     Utils();

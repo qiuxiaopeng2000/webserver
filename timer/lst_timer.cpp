@@ -104,5 +104,87 @@ void sort_timer_lst::tick() {
 
 // 从头遍历找到 timer 插入的位置进行插入，保证链表的 expire 域从小到大排序
 void sort_timer_lst::add_timer(util_timer* timer, util_timer* lst_head) {
+    util_timer* prev = lst_head;
+    util_timer* tmp = prev->next;
+    while (tmp)
+    {
+        if (timer->expire < tmp->expire) {
+            prev->next = timer;
+            timer->next = tmp;
+            timer->prev = prev;
+            tmp->prev = timer;
+            break;
+        }
+        prev = tmp;
+        tmp = tmp->next;
+    }
+    if (!tmp) {
+        prev->next = timer;
+        timer->prev = prev;
+        timer->next = NULL;
+        tail = timer;
+    }
+}
 
+void Utils::init(int timeslot) {
+    m_TIMESLOT = timeslot;
+}
+
+// 对文件描述符设置为非阻塞
+int Utils::setnonblocking(int fd) {
+    int old_option = fcntl(fd, F_GETFL);
+    int new_option = old_option | O_NONBLOCK;
+    fcntl(fd, F_SETFL, new_option);
+    return old_option;
+}
+
+// 将内核事件表注册为读事件，ET模式，选择开启 EPOLLONESHOT
+void Utils::addsig(int epollfd, int fd, bool one_shot, int TRIGMode) {
+    epoll_event event;
+    event.data.fd = fd;
+
+    if (TRIGMode == 1) {
+        event.events = EPOLLIN | EPOLLET | EPOLLRDBAND;
+    } else event.events = EPOLLIN | EPOLLRDHUP;
+
+    if (one_shot) {
+        event.events |= EPOLLONESHOT;
+    }
+    epoll_ctl(epollfd, EPOLL_CTL_ADD, fd, & event);
+    setnonblocking(fd);
+}
+
+void Utils::addsig(int sig, void(sig_handler)(int), bool restart) {
+    struct sigaction sa;
+    memeset(& sa, '\0', sizeof sa);
+    sa.sa_handler = sig_handler;
+    if (restart) {
+        sa.sa_flags |= SA_RESTART;
+    }
+    sigfillset(& sa.sa_mask);       // 信号掩码（信号屏蔽字），用于指定哪些信号应该被阻塞，从而当值它们中断正在执行的进程
+    assert(sigaction(sig, & sa, NULL) != -1);
+}
+
+void Utils::timer_handler() {
+    m_timer_lst.tick();
+    alarm(m_TIMESLOT);
+}
+
+void Utils::show_eroor(int connfd, const char* info) {
+    send(connfd, info, strlen(info), 0);
+    close(connfd);
+}
+
+int* Utils::u_pipefd = 0;
+int Utils::u_epollfd = 0;
+
+class Utils;
+
+
+// 从内核事件表删除事件，关闭文件描述符，释放连接资源
+void cb_func(client_data* user_data) {
+    epoll_ctl(Utils::u_epollfd, EPOLL_CTL_DEL, user_data->sockfd, 0);
+    assert(user_data);
+    close(user_data->sockfd);
+    http_conn::m_user_count--;
 }

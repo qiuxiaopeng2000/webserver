@@ -21,6 +21,7 @@
 #include <sys/wait.h>
 #include <sys/uio.h>
 #include <map>
+#include <string.h>
 
 #include "../synchronize/lock.h"
 #include "../synchronize/signal.h"
@@ -73,6 +74,8 @@ private:
     HTTP_CODE parse_headers(char* text);
     HTTP_CODE parse_content(char* text);
     HTTP_CODE do_request();
+    char *get_line() { return m_read_buf + m_start_line; };
+    LINE_STATUS parse_line();
     void unmap();
     bool add_response(const char* format, ...);
     bool add_context(const char* content);
@@ -105,8 +108,21 @@ public:
         LINE_OK = 0, LINE_BAD, LINE_OPEN
     };
 
-    
+public:
+    http_conn();
+    ~http_conn();
 
+    void init(int sockfd, const sockaddr_in& addr, char*, int ,int , string user, string passwd, string sqlname);
+    void close_conn(bool real_close = true);
+    void process();
+    void read_once();
+    void write();
+    sockaddr_in* get_address() {
+        return & m_address;
+    }
+    void init_mysql_result(connection_pool* connPool);
+    int timer_flag;
+    int improv;
 };
 
 
