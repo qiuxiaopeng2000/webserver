@@ -139,7 +139,7 @@ int Utils::setnonblocking(int fd) {
 }
 
 // 将内核事件表注册为读事件，ET模式，选择开启 EPOLLONESHOT
-void Utils::addsig(int epollfd, int fd, bool one_shot, int TRIGMode) {
+void Utils::addwritefd(int epollfd, int fd, bool one_shot, int TRIGMode) {
     epoll_event event;
     event.data.fd = fd;
 
@@ -152,6 +152,16 @@ void Utils::addsig(int epollfd, int fd, bool one_shot, int TRIGMode) {
     }
     epoll_ctl(epollfd, EPOLL_CTL_ADD, fd, & event);
     setnonblocking(fd);
+}
+
+//信号处理函数
+void Utils::sig_handler(int sig)
+{
+    //为保证函数的可重入性，保留原来的errno
+    int save_errno = errno;
+    int msg = sig;
+    send(u_pipefd[1], (char *)&msg, 1, 0);
+    errno = save_errno;
 }
 
 void Utils::addsig(int sig, void(sig_handler)(int), bool restart) {
@@ -170,7 +180,7 @@ void Utils::timer_handler() {
     alarm(m_TIMESLOT);
 }
 
-void Utils::show_eroor(int connfd, const char* info) {
+void Utils::show_error(int connfd, const char* info) {
     send(connfd, info, strlen(info), 0);
     close(connfd);
 }
@@ -179,7 +189,6 @@ int* Utils::u_pipefd = 0;
 int Utils::u_epollfd = 0;
 
 class Utils;
-
 
 // 从内核事件表删除事件，关闭文件描述符，释放连接资源
 void cb_func(client_data* user_data) {
