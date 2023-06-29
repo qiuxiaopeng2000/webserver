@@ -54,7 +54,29 @@
         "condition_variable": "cpp",
         "map": "cpp",
         "ratio": "cpp",
+        "cerrno": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled",
-    "C_Cpp.intelliSenseEngine": "default"
+    "C_Cpp.intelliSenseEngine": "default",
+    "editor.suggest.snippetsPreventQuickSuggestions": false,
+    "emmet.preferences": {},
+    "workbench.colorTheme": "Default Dark+",
+    "cmake.configureOnOpen": true,
+    "window.zoomLevel": 1,
+    "editor.minimap.enabled": false,
+    "C_Cpp.autocomplete": "default",
+    "[cpp]": {
+        "editor.quickSuggestions": {
+            "other": "on",
+            "comments": "on",
+            "strings": "on"
+        }
+    },
+    "[c]": {
+        "editor.quickSuggestions": {
+            "comments": "on",
+            "other": "on",
+            "strings": "on"
+        }
+    }
 }
